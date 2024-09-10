@@ -33,7 +33,7 @@ public class LivreDaoImp implements LivreDao {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(e.getMessage());
         }
 
 
