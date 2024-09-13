@@ -4,15 +4,19 @@ import Metier.Magazine;
 import Persistance.MagazineDaoImp;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ConsoleUiMagazine{
     private MagazineDaoImp magazineDaoImp;
     private Scanner scanner;
+    private HashMap<String, Magazine> magazineMap;
 
     public ConsoleUiMagazine(MagazineDaoImp magazineDaoImp){
         this.magazineDaoImp = magazineDaoImp;
         scanner = new Scanner(System.in);
+        this.magazineMap = new HashMap<>();
+        populateMagazineMap();
     }
 
     public void gereMagazine(){
@@ -148,6 +152,23 @@ public class ConsoleUiMagazine{
             System.out.println("Magazine deleted successfully!");
         }else {
             System.out.println("Magazine not found.");
+        }
+    }
+
+    private void populateMagazineMap() {
+        magazineDaoImp.getMagazines().forEach(magazine ->
+                magazineMap.put(magazine.getTitle().toLowerCase(), magazine)
+        );
+    }
+
+    public void searchMagazine() {
+        System.out.println("Enter the title of the book to search:");
+        String title = scanner.nextLine().toLowerCase();
+        if (magazineMap.containsKey(title)) {
+            Magazine foundMagazine = magazineMap.get(title);
+            foundMagazine.afficher();
+        } else {
+            System.out.println("Book not found.");
         }
     }
 

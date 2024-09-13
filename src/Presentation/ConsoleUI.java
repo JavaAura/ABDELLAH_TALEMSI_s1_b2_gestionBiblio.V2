@@ -17,7 +17,7 @@ public class ConsoleUI {
 
     public ConsoleUI(ConsoleUiLivre consoleUiLivre, ConsoleUiMagazine consoleUiMagazine,
                      ConsoleUiJournal consoleUiJournal, ConsoleUiThese consoleUiThese,
-                     ConsoleUiEtudiant consoleUiEtudiant, ConsoleUiProfesseur consoleUiProfesseur,Bibliotheque bibliotheque) {
+                     ConsoleUiEtudiant consoleUiEtudiant, ConsoleUiProfesseur consoleUiProfesseur, Bibliotheque bibliotheque) {
         this.consoleUiLivre = consoleUiLivre;
         this.consoleUiMagazine = consoleUiMagazine;
         this.consoleUiJournal = consoleUiJournal;
@@ -156,10 +156,14 @@ public class ConsoleUI {
             System.out.println("1. View All Books");
             System.out.println("2. View All Magazines");
             System.out.println("3. Borrow Book");
-            System.out.println("4. Reserve Book");
-            System.out.println("5. Display one book");
-            System.out.println("6. Display one magazine");
-            System.out.println("7. Deconnect and return to Main Menu");
+            System.out.println("4. Return Book");
+            System.out.println("5. Reserve Book");
+            System.out.println("6. Cancel Reservation");
+            System.out.println("7. Display One Book");
+            System.out.println("8. Display One Magazine");
+            System.out.println("9. Search for a Book");
+            System.out.println("10. Search for a Magazine");
+            System.out.println("11. Deconnect and Return to Main Menu");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
             scanner.nextLine();  // Consume the newline
@@ -183,44 +187,70 @@ public class ConsoleUI {
                     }
                     break;
                 case 4:
-                    System.out.print("Enter Book ID to reserve: ");
-                    int reserveBookId = scanner.nextInt();
+                    System.out.print("Enter Book ID to return: ");
+                    int returnBookId = scanner.nextInt();
                     scanner.nextLine();
-                    boolean isRetourner = bibliotheque.retourner(reserveBookId);
+                    boolean isRetourner = bibliotheque.retourner(returnBookId);
                     if (isRetourner) {
-                        System.out.println("Book reserved successfully.");
-                    }else{
-                        System.out.println("Failed to reserve the book. It might already be reserved.");
+                        System.out.println("Book returned successfully.");
+                    } else {
+                        System.out.println("Failed to return the book.");
                     }
                     break;
                 case 5:
-                    consoleUiLivre.afficherLivre();
+                    System.out.print("Enter Book ID to reserve: ");
+                    int reserveBookId = scanner.nextInt();
+                    scanner.nextLine();
+                    bibliotheque.reserve(reserveBookId, etudiantId);
                     break;
                 case 6:
-                    consoleUiMagazine.afficherMagazine();
+                    System.out.print("Enter Book ID to cancel reservation: ");
+                    int cancelReserveBookId = scanner.nextInt();
+                    scanner.nextLine();
+                    bibliotheque.unreserve(cancelReserveBookId, etudiantId);
                     break;
                 case 7:
+                    consoleUiLivre.afficherLivre();
+                    break;
+                case 8:
+                    consoleUiMagazine.afficherMagazine();
+                    break;
+                case 9:
+                    consoleUiLivre.searchLivre();
+                    break;
+                case 10:
+                    consoleUiMagazine.searchMagazine();
+                    break;
+                case 11:
                     System.out.println("Returning to Main Menu...");
                     break;
                 default:
                     System.out.println("Invalid choice");
             }
-        } while (choice != 7);
+        } while (choice != 11);
     }
+
 
     private void professorMenu(String email) {
         System.out.println("\nAuthenticated as Professor: " + email);
+        int profId = consoleUiProfesseur.getProfId(email);
         int choice;
         do {
             System.out.println("\nProfessor Menu:");
             System.out.println("1. View All Theses");
             System.out.println("2. View All Scientific Journals");
             System.out.println("3. Borrow Book");
-            System.out.println("4. Reserve Book");
-            System.out.println("5. Deconnect and return to Main Menu");
+            System.out.println("4. Return Book");
+            System.out.println("5. Reserve Book");
+            System.out.println("6. Cancel the reservation");
+            System.out.println("7. Display one book");
+            System.out.println("8. Display one magazine");
+            System.out.println("9. Search for a Thesis");
+            System.out.println("10. Search for a Scientific Journal");
+            System.out.println("11. Deconnect and return to Main Menu");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
-            scanner.nextLine();  // Consume the newline
+            scanner.nextLine();
 
             switch (choice) {
                 case 1:
@@ -231,20 +261,57 @@ public class ConsoleUI {
                     break;
                 case 3:
                     System.out.print("Enter Book ID to borrow: ");
-                    String borrowBookId = scanner.nextLine();
-                    // Implement borrowing logic
+                    int borrowBookId = scanner.nextInt();
+                    scanner.nextLine();
+                    boolean isBorrow = bibliotheque.emprunt(borrowBookId, profId);
+                    if (isBorrow) {
+                        System.out.println("Book borrowed successfully.");
+                    } else {
+                        System.out.println("Failed to borrow the book. It might already be reserved.");
+                    }
                     break;
                 case 4:
-                    System.out.print("Enter Book ID to reserve: ");
-                    String reserveBookId = scanner.nextLine();
-                    // Implement reservation logic
+                    System.out.print("Enter Book ID to return: ");
+                    int returnBookId = scanner.nextInt();
+                    scanner.nextLine();
+                    boolean isRetourner = bibliotheque.retourner(returnBookId);
+                    if (isRetourner) {
+                        System.out.println("Book returned successfully.");
+                    } else {
+                        System.out.println("Failed to return the book.");
+                    }
                     break;
                 case 5:
+                    System.out.print("Enter Book ID to reserve: ");
+                    int reserveBookId = scanner.nextInt();
+                    scanner.nextLine();
+                    bibliotheque.reserve(reserveBookId, profId);
+                    break;
+                case 6:
+                    System.out.print("Enter Book ID to cancel reservation: ");
+                    int cancelReserveBookId = scanner.nextInt();
+                    scanner.nextLine();
+                    bibliotheque.unreserve(cancelReserveBookId, profId);
+                    break;
+                case 7:
+                    consoleUiJournal.afficherJournal();
+                    break;
+                case 8:
+                    consoleUiThese.afficherThese();
+                    break;
+                case 9:
+                    consoleUiThese.searchThese();
+                    break;
+                case 10:
+                    consoleUiJournal.searchJournalScientifique();
+                    break;
+                case 11:
                     System.out.println("Returning to Main Menu...");
                     break;
                 default:
                     System.out.println("Invalid choice");
             }
-        } while (choice != 5);
+        } while (choice != 11);
     }
+
 }

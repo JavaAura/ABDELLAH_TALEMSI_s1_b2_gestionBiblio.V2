@@ -45,6 +45,7 @@ public class LivreDaoImp implements LivreDao {
                         rs.getDate("date_publication").toLocalDate(), rs.getInt("nombre_of_pages"), rs.getString("isbn"), this);
                 livre.setEstEmprunter(rs.getBoolean("estemprunter"));
                 livre.setEstReserver(rs.getBoolean("estreserver"));
+                livre.setId(rs.getInt("id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -68,6 +69,7 @@ public class LivreDaoImp implements LivreDao {
                         rs.getDate("date_publication").toLocalDate(), rs.getInt("nombre_of_pages"), rs.getString("isbn"), this);
                 livre.setEstEmprunter(rs.getBoolean("estemprunter"));
                 livre.setEstReserver(rs.getBoolean("estreserver"));
+                livre.setId(rs.getInt("id"));
                 livres.add(livre);
             }
         } catch (SQLException e) {

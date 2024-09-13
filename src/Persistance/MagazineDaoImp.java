@@ -47,6 +47,7 @@ public class MagazineDaoImp implements MagazineDao {
                         rs.getDate("date_publication").toLocalDate(), rs.getInt("nombre_of_pages"), rs.getInt("numero"), this);
                 magazine.setEstEmprunter(rs.getBoolean("estemprunter"));
                 magazine.setEstReserver(rs.getBoolean("estreserver"));
+                magazine.setId(rs.getInt("id"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,6 +71,7 @@ public class MagazineDaoImp implements MagazineDao {
                         rs.getDate("date_publication").toLocalDate(), rs.getInt("nombre_of_pages"), rs.getInt("numero"), this);
                 magazine.setEstEmprunter(rs.getBoolean("estemprunter"));
                 magazine.setEstReserver(rs.getBoolean("estreserver"));
+                magazine.setId(rs.getInt("id"));
                 magazines.add(magazine);
             }
         } catch (SQLException e) {

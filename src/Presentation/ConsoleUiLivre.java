@@ -4,15 +4,20 @@ import Metier.Livre;
 import Persistance.LivreDaoImp;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUiLivre {
     private LivreDaoImp livreDaoImp;
     private Scanner scanner;
+    private HashMap<String, Livre> livreMap;
 
     public ConsoleUiLivre(LivreDaoImp livreDaoImp) {
         this.livreDaoImp = livreDaoImp;
         this.scanner = new Scanner(System.in);
+        this.livreMap = new HashMap<>();
+        populateLivreMap();
     }
 
     public void gereBooks() {
@@ -182,7 +187,6 @@ public class ConsoleUiLivre {
         }else {
             System.out.println("Book not found.");
         }
-
     }
     private void retournerLivre() {
         System.out.println("Enter Livre ID to return:");
@@ -205,6 +209,23 @@ public class ConsoleUiLivre {
         if (livre != null) {
             // Calls the method implemented in Livre class
             System.out.println("Reservation cancelled successfully!");
+        } else {
+            System.out.println("Book not found.");
+        }
+    }
+
+    private void populateLivreMap() {
+        livreDaoImp.getLivres().forEach(livre ->
+                livreMap.put(livre.getTitle().toLowerCase(), livre)
+        );
+    }
+
+    public void searchLivre() {
+        System.out.println("Enter the title of the book to search:");
+        String title = scanner.nextLine().toLowerCase();  // Convert input to lowercase for case-insensitive search
+        if (livreMap.containsKey(title)) {
+            Livre foundLivre = livreMap.get(title);
+            foundLivre.afficher();  // Display the found book
         } else {
             System.out.println("Book not found.");
         }

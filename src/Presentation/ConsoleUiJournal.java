@@ -4,15 +4,19 @@ import Metier.JournalScientifique;
 import Persistance.JournalScientifiqueDaoImp;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ConsoleUiJournal {
     private JournalScientifiqueDaoImp journalSciDaoImp;
     private Scanner scanner;
+    private HashMap<String, JournalScientifique> journalScientifiqueHashMap;
 
     public ConsoleUiJournal(JournalScientifiqueDaoImp journalSciDaoImp) {
         this.journalSciDaoImp = journalSciDaoImp;
         this.scanner = new Scanner(System.in);
+        this.journalScientifiqueHashMap = new HashMap<>();
+        populateJournalScientifiqueMap();
     }
 
     public void gereJournal(){
@@ -158,6 +162,23 @@ public class ConsoleUiJournal {
             System.out.println("Journal deleted successfully!");
         }else {
             System.out.println("Livre not found.");
+        }
+    }
+
+    private void populateJournalScientifiqueMap() {
+        journalSciDaoImp.getJournalScientifiques().forEach(journalScientifique ->
+                journalScientifiqueHashMap.put(journalScientifique.getTitle().toLowerCase(), journalScientifique)
+        );
+    }
+
+    public void searchJournalScientifique() {
+        System.out.println("Enter the title of the book to search:");
+        String title = scanner.nextLine().toLowerCase();  // Convert input to lowercase for case-insensitive search
+        if (journalScientifiqueHashMap.containsKey(title)) {
+            JournalScientifique foundJournal = journalScientifiqueHashMap.get(title);
+            foundJournal.afficher();  // Display the found book
+        } else {
+            System.out.println("Book not found.");
         }
     }
 

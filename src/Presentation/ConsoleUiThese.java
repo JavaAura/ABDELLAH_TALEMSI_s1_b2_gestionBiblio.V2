@@ -1,18 +1,23 @@
 package Presentation;
 
+import Metier.Magazine;
 import Metier.TheseUniversitaire;
 import Persistance.TheseUniversitaireDaoImp;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ConsoleUiThese {
     private TheseUniversitaireDaoImp theseUniversitaireDaoImp;
     private Scanner scanner;
+    private HashMap<String, TheseUniversitaire> theseUniversitaireHashMap;
 
     public ConsoleUiThese(TheseUniversitaireDaoImp theseUniversitaireDaoImp) {
         this.theseUniversitaireDaoImp = theseUniversitaireDaoImp;
         scanner = new Scanner(System.in);
+        this.theseUniversitaireHashMap = new HashMap<>();
+        populateTheseUniversitaireMap();
     }
 
     public void gereThere() {
@@ -159,6 +164,23 @@ public class ConsoleUiThese {
             System.out.println("These deleted successfully!");
         } else {
             System.out.println("These not found.");
+        }
+    }
+
+    private void populateTheseUniversitaireMap() {
+        theseUniversitaireDaoImp.getTheseUniversitaires().forEach(theseUniversitaire ->
+                theseUniversitaireHashMap.put(theseUniversitaire.getTitle().toLowerCase(), theseUniversitaire)
+        );
+    }
+
+    public void searchThese() {
+        System.out.println("Enter the title of the book to search:");
+        String title = scanner.nextLine().toLowerCase();  // Convert input to lowercase for case-insensitive search
+        if (theseUniversitaireHashMap.containsKey(title)) {
+            TheseUniversitaire foundThese = theseUniversitaireHashMap.get(title);
+            foundThese.afficher();  // Display the found book
+        } else {
+            System.out.println("Book not found.");
         }
     }
 

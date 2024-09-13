@@ -113,6 +113,23 @@ public class ProfesseurDaoImp implements ProfesseurDao {
         return professeurExistsByEmail(email); // Delegate to the method checking existence
     }
 
+    public int getProffesorIdByEmail(String email) {
+        int etudiantId = -1;
+        String query = "SELECT id FROM professeur WHERE email = ?";
+
+        try (PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, email);
+            ResultSet resultSet = stmt.executeQuery();
+            if (resultSet.next()) {
+                etudiantId = resultSet.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return etudiantId;  // Return the student ID or -1 if not found
+    }
+
 
 
 }

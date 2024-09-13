@@ -3,15 +3,18 @@ package Metier;
 import Metier.interfaces.Empruntable;
 import Metier.interfaces.Reservable;
 import Persistance.EmprunteDaoImp;
+import Persistance.ReserveDaoImp;
 
 import java.sql.*;
 
 public class Bibliotheque implements Reservable, Empruntable {
 
     private EmprunteDaoImp empruntDao;
+    private ReserveDaoImp reserveDaoImp;
 
     public Bibliotheque(Connection connection) {
         this.empruntDao = new EmprunteDaoImp(connection);
+        this.reserveDaoImp = new ReserveDaoImp(connection);
     }
 
     @Override
@@ -25,12 +28,13 @@ public class Bibliotheque implements Reservable, Empruntable {
     }
 
     @Override
-    public void reserve() {
-
+    public void reserve(int document_id, int user_id) {
+        reserveDaoImp.reserve(document_id, user_id);
     }
 
     @Override
-    public void unreserve() {
+    public void unreserve(int document_id, int user_id) {
+        reserveDaoImp.unreserve(document_id, user_id);
 
     }
 

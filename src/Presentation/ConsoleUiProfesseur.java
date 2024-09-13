@@ -157,5 +157,14 @@ public class ConsoleUiProfesseur {
             return false;
         }
     }
+
+    public  int getProfId(String email) {
+        int id_etudiant = professeurDaoImp.getProffesorIdByEmail(email);
+        if (professeurDaoImp.isEmailExist(email)) {
+            return id_etudiant;
+        }else{
+            return -1;
+        }
+    }
 }
 
