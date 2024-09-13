@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="Breif2_evolution_biblio:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Breif2_evolution_biblio_jar</output-path>
+    <root id="root">
+      <element id="archive" name="Breif2_evolution_biblio.jar">
+        <element id="directory" name="META-INF">
+          <element id="file-copy" path="$PROJECT_DIR$/out/META-INF/MANIFEST.MF" />
+        </element>
+        <element id="module-output" name="Breif2_evolution_biblio" />
+      </element>
+      <element id="library" level="project" name="postgresql-42.7.4" />
+    </root>
+  </artifact>
+</component>
