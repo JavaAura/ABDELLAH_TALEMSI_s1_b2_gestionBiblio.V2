@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/src/Persistance/EmprunteDaoImp.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/Persistance/EtudiantDaoImp.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/Persistance/JournalScientifiqueDaoImp.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/Persistance/LivreDaoImp.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/Persistance/MagazineDaoImp.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/Persistance/ProfesseurDaoImp.java" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/src/Persistance/TheseUniversitaireDaoImp.java" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/src/com/company/DbFunctions.java" dialect="GenericSQL" />
   </component>
 </project>

@@ -4,13 +4,11 @@ public abstract class  Utilisateur {
   protected String nom;
   protected String prenom;
   protected String email;
-  protected String password;
 
-  public Utilisateur(String nom, String prenom, String email, String password) {
+  public Utilisateur(String nom, String prenom, String email) {
       this.nom = nom;
       this.prenom = prenom;
       this.email = email;
-      this.password = password;
   }
   public String getNom() {
       return nom;
@@ -30,16 +28,13 @@ public abstract class  Utilisateur {
   public void setEmail(String email) {
       this.email = email;
   }
-  public String getPassword() {
-      return password;
-  }
-  public void setPassword(String password) {
-      this.password = password;
-  }
+
 
   public abstract void afficher();
   public abstract void ajouterUtilisateur(Utilisateur utilisateur);
   public abstract void modifierUtilisateur(Utilisateur utilisateur);
-  public abstract void supprimerUtilisateur();
+  public abstract void getUtilisateur(String id);
+  public abstract void supprimerUtilisateur(String id);
+  public abstract void checkUtilisateur(Utilisateur utilisateur);
 
 }

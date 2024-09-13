@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface LivreDao {
    void addLivre(Livre livre);
-   LivreDao getLivre(int id);
-   LivreDao getLivre(String titre);
-   List<LivreDao> getLivres();
-   void updateLivre(Livre livre);
+   Livre getLivreById(int id);
+   Livre getLivreByTitle(String titre);
+   List<Livre> getLivres();
+   void updateLivre(Livre livre ,int id);
    void deleteLivre(int id);
 }

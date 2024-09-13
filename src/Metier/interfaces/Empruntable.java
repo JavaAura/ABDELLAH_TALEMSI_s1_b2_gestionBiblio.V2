@@ -1,6 +1,6 @@
 package Metier.interfaces;
 
 public interface Empruntable {
-    public boolean emprunt();
-    public boolean retourner();
+    boolean emprunt(int documentId, int userId);
+    public boolean retourner(int documentId);
 }

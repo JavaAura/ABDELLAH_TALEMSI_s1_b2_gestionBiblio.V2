@@ -1,9 +1,12 @@
 package Metier;
 
+import Metier.interfaces.Empruntable;
+import Metier.interfaces.Reservable;
+
 import java.time.LocalDate;
 
-public abstract class Document {
-    protected String id;
+public abstract class Document{
+    protected int id;
     protected String title;
     protected String author;
     protected LocalDate date_publication;
@@ -11,21 +14,20 @@ public abstract class Document {
     protected boolean estEmprunter = false;
     protected boolean estReserver = false;
 
-    public Document(String id,String title, String author, LocalDate date_publication, int nombre_of_pages) {
-        this.id = id;
+    public Document(String title, String author, LocalDate date_publication, int nombre_of_pages) {
         this.title = title;
         this.author = author;
         this.date_publication = date_publication;
         this.nombre_of_pages = nombre_of_pages;
 
     }
-    public String getId() {
+
+    public int getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
-
     public String getTitle() {
         return title;
     }
@@ -64,7 +66,11 @@ public abstract class Document {
     }
 
     public abstract void afficher();
+
+
+    public abstract void afficherLivre(int id);
+
     public abstract void ajouterDocument();
-    public abstract void modifierDocument();
-    public abstract void reserverDocument();
+    public abstract void modifierDocument(int id);
+    public abstract void supprimerDocument(int id);
 }

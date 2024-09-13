@@ -1,12 +1,19 @@
 package Metier;
 
-import java.time.LocalDate;
+import Metier.interfaces.Empruntable;
+import Metier.interfaces.Reservable;
+import Persistance.MagazineDaoImp;
 
-public class Magazine extends Document{
+import java.time.LocalDate;
+import java.util.List;
+
+public class Magazine extends Document {
     private int numero;
-    public Magazine(String id,String title, String author, LocalDate date_publication, int nombre_of_pages, int numero) {
-        super(id,title, author, date_publication, nombre_of_pages);
+    private MagazineDaoImp magazineDaoImp;
+    public Magazine(String title, String author, LocalDate date_publication, int nombre_of_pages, int numero, MagazineDaoImp magazineDaoImp) {
+        super(title, author, date_publication, nombre_of_pages);
         this.numero = numero;
+        this.magazineDaoImp = magazineDaoImp;
     }
     public int getNumero() {
         return numero;
@@ -15,25 +22,96 @@ public class Magazine extends Document{
         this.numero = numero;
     }
 
+    public void addMagazine() {
+        if (magazineDaoImp != null) {
+            magazineDaoImp.addMagazine(this);
+        } else {
+            throw new IllegalStateException("MagazineDaoImp is not set");
+        }
+    }
 
+    public void updateMagazine(int id) {
+        if (magazineDaoImp != null) {
+            magazineDaoImp.updateMagazine(this ,id);
+        } else {
+            throw new IllegalStateException("magazineDaoImp is not set");
+        }
+    }
+
+    public void deleteMagazine(int id) {
+        if (magazineDaoImp != null) {
+            magazineDaoImp.deleteMagazine(id);  // Ensure the ID is properly parsed
+        } else {
+            throw new IllegalStateException("MagazineDaoImp is not set");
+        }
+    }
+
+    public static void displayMagazineById(int id, MagazineDaoImp dao) {
+        Magazine magazine = dao.getMagazineById(id);
+        if (magazine != null) {
+            System.out.println("Title: " + magazine.getTitle());
+            System.out.println("Author: " + magazine.getAuthor());
+            System.out.println("Publication Date: " + magazine.getDate_publication());
+            System.out.println("Number of Pages: " + magazine.getNombre_of_pages());
+            System.out.println("Numero: " + magazine.getNumero());
+            System.out.println("Emprunter: " + magazine.isEstEmprunter());
+            System.out.println("Reserver: " + magazine.isEstReserver());
+            System.out.println("---------------");
+        } else {
+            System.out.println("No book found with ID: " + id);
+        }
+    }
+
+    public void afficherAllMagazines() {
+        if (magazineDaoImp != null) {
+            List<Magazine> magazines = magazineDaoImp.getMagazines();
+            for (Magazine magazine : magazines) {
+                System.out.println("Title: " + magazine.getTitle());
+                System.out.println("Author: " + magazine.getAuthor());
+                System.out.println("Publication Date: " + magazine.getDate_publication());
+                System.out.println("Number of Pages: " + magazine.getNombre_of_pages());
+                System.out.println("Numero: " + magazine.getNumero());
+                System.out.println("Emprunter: " + (magazine.isEstEmprunter() ? "Non disponible" : "Disponible"));
+                System.out.println("Reserver: " + (magazine.isEstReserver() ? "Non disponible" : "Disponible"));
+                System.out.println("---------------");
+            }
+        } else {
+            throw new IllegalStateException("MagazineDaoImp is not set");
+        }
+    }
 
     @Override
     public void afficher() {
+        afficherAllMagazines();
 
     }
+
+    @Override
+    public void afficherLivre(int id) {
+        if (magazineDaoImp != null) {
+            displayMagazineById(id, magazineDaoImp);
+        }else {
+            throw new IllegalStateException("MagazineDaoImp is not set");
+        }
+    }
+
 
     @Override
     public void ajouterDocument() {
+        addMagazine();
 
     }
 
     @Override
-    public void modifierDocument() {
+    public void modifierDocument(int id) {
+        updateMagazine(id);
 
     }
 
     @Override
-    public void reserverDocument() {
+    public void supprimerDocument(int id) {
+        deleteMagazine(id);
 
     }
+
 }
