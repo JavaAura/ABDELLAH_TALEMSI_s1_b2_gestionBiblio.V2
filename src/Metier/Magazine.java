@@ -113,5 +113,15 @@ public class Magazine extends Document {
         deleteMagazine(id);
 
     }
+    public void afficherMagazine() {
+        System.out.println("ID : " + getId());
+        System.out.println("Title: " + getTitle());
+        System.out.println("Author: " + getAuthor());
+        System.out.println("Publication Date: " + getDate_publication());
+        System.out.println("Number of Pages: " + getNombre_of_pages());
+        System.out.println("Numero: " + getNumero());
+        System.out.println("Emprunter: " + (isEstEmprunter() ? "Non disponible" : "Disponible"));
+        System.out.println("Reserver: " + (isEstReserver() ? "Non disponible" : "Disponible"));
+    }
 
 }

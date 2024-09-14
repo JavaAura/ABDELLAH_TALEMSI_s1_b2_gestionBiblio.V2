@@ -135,4 +135,17 @@ public class TheseUniversitaire extends Document {
          deleteTheseuniversitaire(id);
     }
 
+    public void afficherThese() {
+        System.out.println("ID : " + getId());
+        System.out.println("Title: " + getTitle());
+        System.out.println("Author: " + getAuthor());
+        System.out.println("Publication Date: " + getDate_publication());
+        System.out.println("Number of Pages: " + getNombre_of_pages());
+        System.out.println("Id These: " + getId_theseUniversitaire());
+        System.out.println("Domaine : " + getDomaine());
+        System.out.println("Universitaire: " + getUniversitaire());
+        System.out.println("Emprunter: " + (isEstEmprunter() ? "Non disponible" : "Disponible"));
+        System.out.println("Reserver: " + (isEstReserver() ? "Non disponible" : "Disponible"));
+    }
+
 }

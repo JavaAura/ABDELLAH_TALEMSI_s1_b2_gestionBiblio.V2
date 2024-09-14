@@ -126,5 +126,16 @@ public class JournalScientifique extends Document {
         deleteJournalScientifique(id);
 
     }
+    public void afficherJounale() {
+        System.out.println("ID : " + getIdJournal());
+        System.out.println("Title: " + getTitle());
+        System.out.println("Author: " + getAuthor());
+        System.out.println("Publication Date: " + getDate_publication());
+        System.out.println("Number of Pages: " + getNombre_of_pages());
+        System.out.println("Id Journal: " + getIdJournal());
+        System.out.println("Domaine Recherche: " + getDomaineRechercher());
+        System.out.println("Emprunter: " + (isEstEmprunter() ? "Non disponible" : "Disponible"));
+        System.out.println("Reserver: " + (isEstReserver() ? "Non disponible" : "Disponible"));
+    }
 
 }

@@ -2,25 +2,41 @@ package Presentation;
 
 import Metier.Magazine;
 import Persistance.MagazineDaoImp;
+import utilitaire.InputValidator;
 
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
-public class ConsoleUiMagazine{
+public class ConsoleUiMagazine {
     private MagazineDaoImp magazineDaoImp;
     private Scanner scanner;
     private HashMap<String, Magazine> magazineMap;
 
-    public ConsoleUiMagazine(MagazineDaoImp magazineDaoImp){
+    // Functional interface for validation
+    @FunctionalInterface
+    interface Validator<T> {
+        boolean validate(T input);
+    }
+
+    // Functional interface for input retrieval
+    @FunctionalInterface
+    interface InputRetriever<T> {
+        T retrieve();
+    }
+
+    public ConsoleUiMagazine(MagazineDaoImp magazineDaoImp) {
         this.magazineDaoImp = magazineDaoImp;
-        scanner = new Scanner(System.in);
+        this.scanner = new Scanner(System.in);
         this.magazineMap = new HashMap<>();
         populateMagazineMap();
     }
 
-    public void gereMagazine(){
-        int choice ;
+    public void gereMagazine() {
+        int choice;
 
         do {
             System.out.println("Library Management System");
@@ -40,6 +56,7 @@ public class ConsoleUiMagazine{
                 case 2:
                     System.out.println("Enter Magazine ID to update:");
                     int id = scanner.nextInt();
+                    scanner.nextLine();
                     modifierMagazine(id);
                     break;
                 case 3:
@@ -61,96 +78,118 @@ public class ConsoleUiMagazine{
     }
 
     private void ajouterMagazine() {
-        System.out.println("Enter Magazine title:");
-        String title = scanner.nextLine();
-        System.out.println("Enter Magazine author:");
-        String author = scanner.nextLine();
-        System.out.println("Enter Numero:");
-        int numero = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Enter number of pages:");
-        int pages = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
-        System.out.println("Enter publication date (YYYY-MM-DD):");
-        LocalDate datePublication = LocalDate.parse(scanner.nextLine());
-        Magazine magazine = new Magazine(title, author, datePublication, pages, numero, magazineDaoImp);
+        String title = getValidatedInput("Enter Magazine title (minimum 3 characters):", InputValidator::validateTitle, scanner::nextLine);
+        String author = getValidatedInput("Enter Magazine author (minimum 3 characters):", InputValidator::validateAuthor, scanner::nextLine);
+        int numero = getValidatedInput("Enter Numero (positive integer):", InputValidator::validateNumero, scanner::nextInt);
+        int pages = getValidatedInput("Enter number of pages (positive integer):", InputValidator::validatePageCount, scanner::nextInt);
+        scanner.nextLine(); // Consume newline
+        String datePublication = getValidatedInput("Enter publication date (YYYY-MM-DD):", InputValidator::validatePublicationDate, scanner::nextLine);
+
+        Magazine magazine = new Magazine(title, author, LocalDate.parse(datePublication), pages, numero, magazineDaoImp);
         magazine.ajouterDocument();
+        System.out.println("Magazine added successfully.");
     }
 
     private void modifierMagazine(int id) {
-        Magazine magazine = magazineDaoImp.getMagazineById(id);  // Retrieve the existing Livre
+        Magazine magazine = magazineDaoImp.getMagazineById(id);
 
         if (magazine != null) {
-            System.out.println("Enter new Livre title (leave blank to keep current): ( current value :" + magazine.getTitle()+") :");
-            String newTitle = scanner.nextLine();
-            scanner.next();
-            if (!newTitle.isBlank()) magazine.setTitle(newTitle);
+            System.out.println("Enter new Magazine title (leave blank to keep current) (current value: " + magazine.getTitle() + "):");
+            String newTitle = getUpdatedInput(magazine.getTitle(), InputValidator::validateTitle, scanner::nextLine);
+            magazine.setTitle(newTitle);
 
-            System.out.println("Enter new author (leave blank to keep current): ( current value :" + magazine.getAuthor()+") :");
-            String newAuthor = scanner.nextLine();
-            scanner.next();
-            if (!newAuthor.isBlank()) magazine.setAuthor(newAuthor);
+            System.out.println("Enter new author (leave blank to keep current) (current value: " + magazine.getAuthor() + "):");
+            String newAuthor = getUpdatedInput(magazine.getAuthor(), InputValidator::validateAuthor, scanner::nextLine);
+            magazine.setAuthor(newAuthor);
 
-            // Publication Date
             System.out.println("Enter new publication date (YYYY-MM-DD) (leave blank to keep current) (current value: " + magazine.getDate_publication() + "):");
-            String newDateInput = scanner.nextLine();
-            scanner.next();
-            if (!newDateInput.isBlank()) {
-                LocalDate newDatePublication = LocalDate.parse(newDateInput);
-                magazine.setDate_publication(newDatePublication);
-            }
+            String newDateInput = getUpdatedInput(magazine.getDate_publication().toString(), InputValidator::validatePublicationDate, scanner::nextLine);
+            magazine.setDate_publication(LocalDate.parse(newDateInput));
 
-            // Number of Pages
             System.out.println("Enter new number of pages (leave 0 to keep current) (current value: " + magazine.getNombre_of_pages() + "):");
-            int newNombrePages = scanner.nextInt();
-            scanner.nextLine();  // Consume newline
-            if (newNombrePages > 0) magazine.setNombre_of_pages(newNombrePages);
+            int newNombrePages = getUpdatedIntegerInput(magazine.getNombre_of_pages(), InputValidator::validatePageCount, scanner::nextInt);
+            magazine.setNombre_of_pages(newNombrePages);
 
-            // Numero
-            System.out.println("Enter new ISBN (leave blank to keep current) (current value: " + magazine.getNumero() + "):");
-            int newNumero = scanner.nextInt();
-            scanner.nextLine();
-            if (newNumero > 0) magazine.setNumero(newNumero);
+            System.out.println("Enter new Numero (leave 0 to keep current) (current value: " + magazine.getNumero() + "):");
+            int newNumero = getUpdatedIntegerInput(magazine.getNumero(), InputValidator::validateNumero, scanner::nextInt);
+            magazine.setNumero(newNumero);
 
-            magazine.modifierDocument(id);  // Calls the method implemented in Livre class
-            System.out.println("Book updated successfully!");
+            magazineDaoImp.updateMagazine(magazine, id);
+            System.out.println("Magazine updated successfully.");
         } else {
-            System.out.println("Book not found.");
+            System.out.println("Magazine not found.");
         }
+    }
+
+    private <T> T getValidatedInput(String prompt, Validator<T> validator, InputRetriever<T> retriever) {
+        T input;
+        do {
+            System.out.println(prompt);
+            input = retriever.retrieve();
+            if (!validator.validate(input)) {
+                System.out.println("Invalid input! Please try again.");
+            }
+        } while (!validator.validate(input));
+        return input;
+    }
+
+    private String getUpdatedInput(String currentValue, Validator<String> validator, InputRetriever<String> retriever) {
+        System.out.println("Enter new value (leave blank to keep current) (current value: " + currentValue + "):");
+        String input = retriever.retrieve();
+        return input.isBlank() ? currentValue : getValidatedInput("", validator, () -> input);
+    }
+
+    private int getUpdatedIntegerInput(int currentValue, Validator<Integer> validator, InputRetriever<Integer> retriever) {
+        System.out.println("Enter new value (leave 0 to keep current) (current value: " + currentValue + "):");
+        int input = retriever.retrieve();
+        return input == 0 ? currentValue : getValidatedInput("", validator, () -> input);
     }
 
     public void afficherMagazine() {
         System.out.println("Enter Magazine ID to display:");
         int id = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
         Magazine magazine = magazineDaoImp.getMagazineById(id);
         if (magazine != null) {
             magazine.afficher();
         } else {
-            System.out.println("Book not found.");
+            System.out.println("Magazine not found.");
         }
     }
 
     public void afficherTousLesMagazines() {
-        System.out.println("==========Magazine==========");
-        magazineDaoImp.getMagazines().forEach(magazine -> {
-            System.out.println("Title: " + magazine.getTitle());
-            System.out.println("Author: " + magazine.getAuthor());
-            System.out.println("Publication Date: " + magazine.getDate_publication());
-            System.out.println("Number of Pages: " + magazine.getNombre_of_pages());
-            System.out.println("Numero: " + magazine.getNumero());
-            System.out.println("Emprunter: " + (magazine.isEstEmprunter() ? "Non disponible" : "Disponible"));
-            System.out.println("Reserver: " + (magazine.isEstReserver() ? "Non disponible" : "Disponible"));
-            System.out.println("---------------");
-        });
+        List<Magazine> magazines = magazineDaoImp.getMagazines();
+
+        System.out.println("========== Magazines ==========");
+
+        magazines.stream()
+                .map(magazine -> String.format(
+                        "ID: %d%n" +
+                                "Title: %s%n" +
+                                "Author: %s%n" +
+                                "Publication Date: %s%n" +
+                                "Number of Pages: %d%n" +
+                                "Numero: %d%n" +
+                                "---------------",
+                        magazine.getId(),
+                        magazine.getTitle(),
+                        magazine.getAuthor(),
+                        magazine.getDate_publication(),
+                        magazine.getNombre_of_pages(),
+                        magazine.getNumero()
+                ))
+                .forEach(System.out::println);
     }
+
     private void supprimerMagazine() {
         System.out.println("Enter Magazine ID to delete:");
         int id = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
         Magazine magazine = magazineDaoImp.getMagazineById(id);
         if (magazine != null) {
-            magazine.deleteMagazine(id);
+            magazineDaoImp.deleteMagazine(id);
             System.out.println("Magazine deleted successfully!");
-        }else {
+        } else {
             System.out.println("Magazine not found.");
         }
     }
@@ -162,14 +201,13 @@ public class ConsoleUiMagazine{
     }
 
     public void searchMagazine() {
-        System.out.println("Enter the title of the book to search:");
-        String title = scanner.nextLine().toLowerCase();
+        System.out.println("Enter the title of the magazine to search:");
+        String title = scanner.nextLine().toLowerCase();  // Convert input to lowercase for case-insensitive search
         if (magazineMap.containsKey(title)) {
             Magazine foundMagazine = magazineMap.get(title);
-            foundMagazine.afficher();
+            foundMagazine.afficherMagazine();  // Display the found magazine
         } else {
-            System.out.println("Book not found.");
+            System.out.println("Magazine not found.");
         }
     }
-
 }

@@ -2,6 +2,12 @@ package Presentation;
 
 import Metier.JournalScientifique;
 import Persistance.JournalScientifiqueDaoImp;
+import utilitaire.InputValidator;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -63,68 +69,137 @@ public class ConsoleUiJournal {
     }
 
     private void ajouterJournal() {
-        System.out.println("Enter Livre title:");
-        String title = scanner.nextLine();
-        System.out.println("Enter Livre author:");
-        String author = scanner.nextLine();
-        System.out.println("Enter ID journal:");
-        int id_journal = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Enter Domaine Recherche:");
-        String domaineRecherche = scanner.nextLine();
-        System.out.println("Enter number of pages:");
-        int pages = scanner.nextInt();
-        scanner.nextLine();  // Consume newline
-        System.out.println("Enter publication date (YYYY-MM-DD):");
-        LocalDate datePublication = LocalDate.parse(scanner.nextLine());
-        JournalScientifique journalScientifique = new JournalScientifique(title, author, datePublication, pages,domaineRecherche,id_journal,journalSciDaoImp );
+        String title = getValidatedTitle();
+        String author = getValidatedAuthor();
+        int idJournal = getValidatedIdJournal();
+        String domaineRecherche = getValidatedDomaineRecherche();
+        int pages = getValidatedNumberOfPages();
+        String datePublication = getValidatedPublicationDate();
+
+        JournalScientifique journalScientifique = new JournalScientifique(title, author, LocalDate.parse(datePublication), pages, domaineRecherche, idJournal, journalSciDaoImp);
         journalScientifique.ajouterDocument();
+        System.out.println("Journal added successfully.");
     }
 
     private void modifierJournal(int id) {
-        JournalScientifique journalScientifique = journalSciDaoImp.getJournalScientifiqueById(id);  // Retrieve the existing Livre
+        JournalScientifique journalScientifique = journalSciDaoImp.getJournalScientifiqueById(id);
 
         if (journalScientifique != null) {
-            System.out.println("Enter new Livre title (leave blank to keep current): ( current value :" + journalScientifique.getTitle()+") :");
+            System.out.println("Enter new Journal title (leave blank to keep current) (current value: " + journalScientifique.getTitle() + "):");
             String newTitle = scanner.nextLine();
-            if (!newTitle.isBlank()) journalScientifique.setTitle(newTitle);
+            if (!newTitle.isBlank()) {
+                journalScientifique.setTitle(getValidatedTitle());
+            }
 
-            System.out.println("Enter new author (leave blank to keep current): ( current value :" + journalScientifique.getAuthor()+") :");
+            System.out.println("Enter new author (leave blank to keep current) (current value: " + journalScientifique.getAuthor() + "):");
             String newAuthor = scanner.nextLine();
-            if (!newAuthor.isBlank()) journalScientifique.setAuthor(newAuthor);
+            if (!newAuthor.isBlank()) {
+                journalScientifique.setAuthor(getValidatedAuthor());
+            }
 
-            // Publication Date
             System.out.println("Enter new publication date (YYYY-MM-DD) (leave blank to keep current) (current value: " + journalScientifique.getDate_publication() + "):");
             String newDateInput = scanner.nextLine();
             if (!newDateInput.isBlank()) {
-                LocalDate newDatePublication = LocalDate.parse(newDateInput);
-                journalScientifique.setDate_publication(newDatePublication);
+                journalScientifique.setDate_publication(LocalDate.parse(getValidatedPublicationDate()));
             }
 
-            // Number of Pages
             System.out.println("Enter new number of pages (leave 0 to keep current) (current value: " + journalScientifique.getNombre_of_pages() + "):");
-            int newNombrePages = scanner.nextInt();
-            scanner.nextLine();// Consume newline
-            if (newNombrePages > 0) journalScientifique.setNombre_of_pages(newNombrePages);
+            int newNombrePages = getValidatedNumberOfPages();
+            if (newNombrePages > 0) {
+                journalScientifique.setNombre_of_pages(getValidatedNumberOfPages());
+            }
 
-            // Id journal
             System.out.println("Enter new Id Journal (leave 0 to keep current) (current value: " + journalScientifique.getIdJournal() + "):");
-            int newIdJournal = scanner.nextInt();
-            scanner.nextLine();
-            if (newIdJournal > 0) journalScientifique.setIdJournal(newIdJournal);
+            int newIdJournal = getValidatedIdJournal();
+            if (newIdJournal > 0) {
+                journalScientifique.setIdJournal(getValidatedIdJournal());
+            }
 
-            //Domaine Recherche
-
-            System.out.println("Enter new author (leave blank to keep current): ( current value :" + journalScientifique.getDomaineRechercher()+") :");
+            System.out.println("Enter new Domaine Recherche (leave blank to keep current) (current value: " + journalScientifique.getDomaineRechercher() + "):");
             String newDomaineRecherche = scanner.nextLine();
-            if (!newDomaineRecherche.isBlank()) journalScientifique.setAuthor(newDomaineRecherche);
+            if (!newDomaineRecherche.isBlank()) {
+                journalScientifique.setDomaineRechercher(getValidatedDomaineRecherche());
+            }
 
-
-            journalScientifique.modifierDocument(id);  // Calls the method implemented in Livre class
-            System.out.println("Book updated successfully!");
+            journalScientifique.modifierDocument(id);
+            System.out.println("Journal updated successfully.");
         } else {
-            System.out.println("Book not found.");
+            System.out.println("Journal not found.");
         }
+    }
+
+    private String getValidatedTitle() {
+        String title;
+        do {
+            System.out.println("Enter Journal title (minimum 3 characters):");
+            title = scanner.nextLine();
+            if (!InputValidator.validateTitle(title)) {
+                System.out.println("Invalid title! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateTitle(title));
+        return title;
+    }
+
+    private String getValidatedAuthor() {
+        String author;
+        do {
+            System.out.println("Enter Journal author (minimum 3 characters):");
+            author = scanner.nextLine();
+            if (!InputValidator.validateAuthor(author)) {
+                System.out.println("Invalid author! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateAuthor(author));
+        return author;
+    }
+
+    private int getValidatedIdJournal() {
+        int idJournal;
+        do {
+            System.out.println("Enter ID Journal (positive integer):");
+            idJournal = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            if (!InputValidator.validateNumero(idJournal)) {
+                System.out.println("Invalid ID Journal! It must be a positive integer.");
+            }
+        } while (!InputValidator.validateNumero(idJournal));
+        return idJournal;
+    }
+
+    private String getValidatedDomaineRecherche() {
+        String domaineRecherche;
+        do {
+            System.out.println("Enter Domaine Recherche (minimum 3 characters):");
+            domaineRecherche = scanner.nextLine();
+            if (!InputValidator.validateTitle(domaineRecherche)) {  // Assuming similar validation as title
+                System.out.println("Invalid Domaine Recherche! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateTitle(domaineRecherche));
+        return domaineRecherche;
+    }
+
+    private int getValidatedNumberOfPages() {
+        int pages;
+        do {
+            System.out.println("Enter number of pages (positive integer):");
+            pages = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            if (!InputValidator.validatePageCount(pages)) {
+                System.out.println("Invalid number of pages! It must be a positive integer.");
+            }
+        } while (!InputValidator.validatePageCount(pages));
+        return pages;
+    }
+
+    private String getValidatedPublicationDate() {
+        String datePublication;
+        do {
+            System.out.println("Enter publication date (YYYY-MM-DD):");
+            datePublication = scanner.nextLine();
+            if (!InputValidator.validatePublicationDate(datePublication)) {
+                System.out.println("Invalid date! Please enter a valid past date in the format YYYY-MM-DD.");
+            }
+        } while (!InputValidator.validatePublicationDate(datePublication));
+        return datePublication;
     }
 
     public void afficherJournal() {
@@ -137,21 +212,37 @@ public class ConsoleUiJournal {
             System.out.println("Book not found.");
         }
     }
+
     public void afficherTousLesJournals() {
-        System.out.println("==========Journal==========");
-        journalSciDaoImp.getJournalScientifiques().forEach(journalScientifique -> {
-            System.out.println("ID : "+journalScientifique.getId());
-            System.out.println("Title: " + journalScientifique.getTitle());
-            System.out.println("Author: " + journalScientifique.getAuthor());
-            System.out.println("Publication Date: " + journalScientifique.getDate_publication());
-            System.out.println("Number of Pages: " + journalScientifique.getNombre_of_pages());
-            System.out.println("Id Journal: " + journalScientifique.getIdJournal());
-            System.out.println("Domaine Recherche: " + journalScientifique.getDomaineRechercher());
-            System.out.println("Emprunter: " + (journalScientifique.isEstEmprunter() ? "Non disponible" : "Disponible"));
-            System.out.println("Reserver: " + (journalScientifique.isEstReserver() ? "Non disponible" : "Disponible"));
-            System.out.println("---------------");
-        });
+        List<JournalScientifique> journals = journalSciDaoImp.getJournalScientifiques();
+
+        System.out.println("========== Journal ==========");
+
+        journals.stream()
+                .map(journal -> String.format(
+                        "ID: %d%n" +
+                                "Title: %s%n" +
+                                "Author: %s%n" +
+                                "Publication Date: %s%n" +
+                                "Number of Pages: %d%n" +
+                                "Id Journal: %d%n" +
+                                "Domaine Recherche: %s%n" +
+                                "Emprunter: %s%n" +
+                                "Reserver: %s%n" +
+                                "---------------",
+                        journal.getId(),
+                        journal.getTitle(),
+                        journal.getAuthor(),
+                        journal.getDate_publication(),
+                        journal.getNombre_of_pages(),
+                        journal.getIdJournal(),
+                        journal.getDomaineRechercher(),
+                        journal.isEstEmprunter() ? "Non disponible" : "Disponible",
+                        journal.isEstReserver() ? "Non disponible" : "Disponible"
+                ))
+                .forEach(System.out::println);
     }
+
 
     private void supprimerJournal() {
         System.out.println("Enter Journal ID to delete:");
@@ -173,10 +264,10 @@ public class ConsoleUiJournal {
 
     public void searchJournalScientifique() {
         System.out.println("Enter the title of the book to search:");
-        String title = scanner.nextLine().toLowerCase();  // Convert input to lowercase for case-insensitive search
+        String title = scanner.nextLine().toLowerCase();
         if (journalScientifiqueHashMap.containsKey(title)) {
             JournalScientifique foundJournal = journalScientifiqueHashMap.get(title);
-            foundJournal.afficher();  // Display the found book
+            foundJournal.afficherJounale();
         } else {
             System.out.println("Book not found.");
         }

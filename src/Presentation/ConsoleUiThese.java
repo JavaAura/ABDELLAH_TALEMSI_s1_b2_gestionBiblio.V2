@@ -3,6 +3,11 @@ package Presentation;
 import Metier.Magazine;
 import Metier.TheseUniversitaire;
 import Persistance.TheseUniversitaireDaoImp;
+import utilitaire.InputValidator;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
 
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -63,61 +68,51 @@ public class ConsoleUiThese {
     }
 
     private void ajouterThese() {
-        System.out.println("Enter These title:");
-        String title = scanner.nextLine();
-        System.out.println("Enter These author:");
-        String author = scanner.nextLine();
-        System.out.println("Enter ID These:");
-        int id_these = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Enter Domaine:");
-        String domaine = scanner.nextLine();
-        System.out.println("Enter Universite:");
-        String universite = scanner.nextLine();
-        System.out.println("Enter number of pages:");
-        int pages = scanner.nextInt();
-        scanner.nextLine();
-        System.out.println("Enter publication date (YYYY-MM-DD):");
-        LocalDate datePublication = LocalDate.parse(scanner.nextLine());
-        TheseUniversitaire these = new TheseUniversitaire(title, author, datePublication, pages, id_these, domaine, universite, theseUniversitaireDaoImp);
+        String title = getValidatedTitle();
+        String author = getValidatedAuthor();
+        int idThese = getValidatedIdThese();
+        String domaine = getValidatedDomaine();
+        String universite = getValidatedUniversite();
+        int pages = getValidatedNumberOfPages();
+        String datePublication = getValidatedPublicationDate();
+
+        TheseUniversitaire these = new TheseUniversitaire(title, author, LocalDate.parse(datePublication), pages, idThese, domaine, universite, theseUniversitaireDaoImp);
         these.ajouterDocument();
+        System.out.println("These added successfully.");
     }
 
     private void modifierThese(int id) {
         TheseUniversitaire these = theseUniversitaireDaoImp.getTheseUniversitaireById(id);
 
         if (these != null) {
-            System.out.println("Enter new These title (leave blank to keep current): ( current value :" + these.getTitle() + ") :");
+            System.out.println("Enter new These title (leave blank to keep current) (current value: " + these.getTitle() + "):");
             String newTitle = scanner.nextLine();
-            if (!newTitle.isBlank()) these.setTitle(newTitle);
+            if (!newTitle.isBlank()) these.setTitle(getValidatedTitle());
 
-            System.out.println("Enter new author (leave blank to keep current): ( current value :" + these.getAuthor() + ") :");
+            System.out.println("Enter new author (leave blank to keep current) (current value: " + these.getAuthor() + "):");
             String newAuthor = scanner.nextLine();
-            if (!newAuthor.isBlank()) these.setAuthor(newAuthor);
+            if (!newAuthor.isBlank()) these.setAuthor(getValidatedAuthor());
 
             System.out.println("Enter new publication date (YYYY-MM-DD) (leave blank to keep current) (current value: " + these.getDate_publication() + "):");
             String newDateInput = scanner.nextLine();
             if (!newDateInput.isBlank()) {
-                LocalDate newDatePublication = LocalDate.parse(newDateInput);
-                these.setDate_publication(newDatePublication);
+                these.setDate_publication(LocalDate.parse(getValidatedPublicationDate()));
             }
 
             System.out.println("Enter new number of pages (leave 0 to keep current) (current value: " + these.getNombre_of_pages() + "):");
-            int newNombrePages = scanner.nextInt();
-            scanner.nextLine(); // Consume newline
+            int newNombrePages = getValidatedNumberOfPages();
             if (newNombrePages > 0) these.setNombre_of_pages(newNombrePages);
 
             System.out.println("Enter new Domaine (leave blank to keep current) (current value: " + these.getDomaine() + "):");
             String newDomaine = scanner.nextLine();
-            if (!newDomaine.isBlank()) these.setDomaine(newDomaine);
+            if (!newDomaine.isBlank()) these.setDomaine(getValidatedDomaine());
 
             System.out.println("Enter new Universite (leave blank to keep current) (current value: " + these.getUniversitaire() + "):");
             String newUniversite = scanner.nextLine();
-            if (!newUniversite.isBlank()) these.setUniversitaire(newUniversite);
+            if (!newUniversite.isBlank()) these.setUniversitaire(getValidatedUniversite());
 
             System.out.println("Enter new ID These (leave 0 to keep current) (current value: " + these.getId_theseUniversitaire() + "):");
-            int newIdThese = scanner.nextInt();
-            scanner.nextLine();
+            int newIdThese = getValidatedIdThese();
             if (newIdThese > 0) these.setId_theseUniversitaire(newIdThese);
 
             these.modifierDocument(id);
@@ -125,6 +120,92 @@ public class ConsoleUiThese {
         } else {
             System.out.println("These not found.");
         }
+    }
+
+    private String getValidatedTitle() {
+        String title;
+        do {
+            System.out.println("Enter These title (minimum 3 characters):");
+            title = scanner.nextLine();
+            if (!InputValidator.validateTitle(title)) {
+                System.out.println("Invalid title! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateTitle(title));
+        return title;
+    }
+
+    private String getValidatedAuthor() {
+        String author;
+        do {
+            System.out.println("Enter These author (minimum 3 characters):");
+            author = scanner.nextLine();
+            if (!InputValidator.validateAuthor(author)) {
+                System.out.println("Invalid author! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateAuthor(author));
+        return author;
+    }
+
+    private int getValidatedIdThese() {
+        int idThese;
+        do {
+            System.out.println("Enter ID These (positive integer):");
+            idThese = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            if (!InputValidator.validateNumero(idThese)) {
+                System.out.println("Invalid ID These! It must be a positive integer.");
+            }
+        } while (!InputValidator.validateNumero(idThese));
+        return idThese;
+    }
+
+    private String getValidatedDomaine() {
+        String domaine;
+        do {
+            System.out.println("Enter Domaine (minimum 3 characters):");
+            domaine = scanner.nextLine();
+            if (!InputValidator.validateTitle(domaine)) { // Assuming similar validation as title
+                System.out.println("Invalid Domaine! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateTitle(domaine));
+        return domaine;
+    }
+
+    private String getValidatedUniversite() {
+        String universite;
+        do {
+            System.out.println("Enter Universite (minimum 3 characters):");
+            universite = scanner.nextLine();
+            if (!InputValidator.validateTitle(universite)) { // Assuming similar validation as title
+                System.out.println("Invalid Universite! Please enter at least 3 characters.");
+            }
+        } while (!InputValidator.validateTitle(universite));
+        return universite;
+    }
+
+    private int getValidatedNumberOfPages() {
+        int pages;
+        do {
+            System.out.println("Enter number of pages (positive integer):");
+            pages = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+            if (!InputValidator.validatePageCount(pages)) {
+                System.out.println("Invalid number of pages! It must be a positive integer.");
+            }
+        } while (!InputValidator.validatePageCount(pages));
+        return pages;
+    }
+
+    private String getValidatedPublicationDate() {
+        String datePublication;
+        do {
+            System.out.println("Enter publication date (YYYY-MM-DD):");
+            datePublication = scanner.nextLine();
+            if (!InputValidator.validatePublicationDate(datePublication)) {
+                System.out.println("Invalid date! Please enter a valid past date in the format YYYY-MM-DD.");
+            }
+        } while (!InputValidator.validatePublicationDate(datePublication));
+        return datePublication;
     }
 
     public void afficherThese() {
@@ -139,20 +220,33 @@ public class ConsoleUiThese {
     }
 
     public void afficherToutesLesTheses() {
-        System.out.println("==========Theses==========");
-        theseUniversitaireDaoImp.getTheseUniversitaires().forEach(these -> {
-            System.out.println("ID Document : " + these.getId());
-            System.out.println("Title: " + these.getTitle());
-            System.out.println("Author: " + these.getAuthor());
-            System.out.println("Publication Date: " + these.getDate_publication());
-            System.out.println("Number of Pages: " + these.getNombre_of_pages());
-            System.out.println("ID These : " + these.getId_theseUniversitaire());
-            System.out.println("Domaine: " + these.getDomaine());
-            System.out.println("Universite: " + these.getUniversitaire());
-            System.out.println("Emprunter: " + (these.isEstEmprunter() ? "Non disponible" : "Disponible"));
-            System.out.println("Reserver: " + (these.isEstReserver() ? "Non disponible" : "Disponible"));
-            System.out.println("---------------");
-        });
+        List<TheseUniversitaire> theses = theseUniversitaireDaoImp.getTheseUniversitaires();
+        System.out.println("========== Theses ==========");
+        theses.stream()
+                .map(these -> String.format(
+                        "ID Document: %d%n" +
+                                "Title: %s%n" +
+                                "Author: %s%n" +
+                                "Publication Date: %s%n" +
+                                "Number of Pages: %d%n" +
+                                "ID These: %d%n" +
+                                "Domaine: %s%n" +
+                                "Universite: %s%n" +
+                                "Emprunter: %s%n" +
+                                "Reserver: %s%n" +
+                                "---------------",
+                        these.getId(),
+                        these.getTitle(),
+                        these.getAuthor(),
+                        these.getDate_publication(),
+                        these.getNombre_of_pages(),
+                        these.getId_theseUniversitaire(),
+                        these.getDomaine(),
+                        these.getUniversitaire(),
+                        these.isEstEmprunter() ? "Non disponible" : "Disponible",
+                        these.isEstReserver() ? "Non disponible" : "Disponible"
+                ))
+                .forEach(System.out::println);
     }
 
     private void supprimerThese() {
@@ -178,7 +272,7 @@ public class ConsoleUiThese {
         String title = scanner.nextLine().toLowerCase();  // Convert input to lowercase for case-insensitive search
         if (theseUniversitaireHashMap.containsKey(title)) {
             TheseUniversitaire foundThese = theseUniversitaireHashMap.get(title);
-            foundThese.afficher();  // Display the found book
+            foundThese.afficherThese();
         } else {
             System.out.println("Book not found.");
         }
