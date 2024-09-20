@@ -122,4 +122,4 @@ Cette application de gestion de bibliothèque a été améliorée pour inclure u
 
 1. **Cloner le Référentiel**
    ```bash
-   git clone [https://github.com/votre-repo/bibliotheque.git](https://github.com/JavaAura/ABDELLAH_TALEMSI_s1_b2_gestionBiblio.V2
+   git clone https://github.com/JavaAura/ABDELLAH_TALEMSI_s1_b2_gestionBiblio.V2
